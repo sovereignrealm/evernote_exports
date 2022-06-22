@@ -1,0 +1,82 @@
+<html lang="en">
+
+<link rel="stylesheet" href="/assets/css/index.css">
+
+<body>
+    <div class="search-term">
+        <div>
+            <label for="">Search term:</label>
+        </div>
+        <br>
+        <div>
+            <input id="term" type="text">
+        </div>
+        <div class="search-elements">
+            <button class="btn-clear">Clear</button>
+            <button class="btn-search">Search</button>
+        </div>
+    </div>
+    <div class="list">
+        <% for(let file of Object.keys(files)) { %>
+            <a href="<%= notebook %>/files/<%= file %>">
+                <%= file %>
+            </a>
+            <br>
+            <% } %>
+    </div>
+    <script>
+        (() => {
+            let previousTerm = "";
+            let isFirstSearch = true;
+            const addEventListeners = () => {
+                document.querySelector("#term").addEventListener("keyup", handleKeyup);
+                document.querySelector(".btn-clear").addEventListener("click", clearValue);
+                document.querySelector(".btn-search").addEventListener("click", searchTerm);
+            }
+            const handleKeyup = () => {
+                if (event.keyCode === 13) {
+                    searchTerm();
+                }
+            }
+            const getFiles = () => {
+                let url = '/notebooks/<%= notebook %>';
+                fetch(url)
+                    .then(response => {
+                        return response.text();
+                    })
+                    .then(html => {
+                        document.body.innerHTML = html;
+                        document.getElementById('term').value = "";
+                        addEventListeners();
+                    })
+            }
+            const clearValue = () => {
+                if (!isFirstSearch && "" === previousTerm) return;
+                isFirstSearch = false;
+                previousTerm = "";
+                getFiles();
+            }
+            const searchTerm = () => {
+                const term = document.getElementById('term').value;
+                if (!isFirstSearch && term === previousTerm) return;
+                isFirstSearch = false;
+                previousTerm = term;
+                let url = '/search-term/<%= notebook %>?';
+                fetch(url + new URLSearchParams({
+                    term,
+                }))
+                    .then(response => {
+                        return response.text();
+                    })
+                    .then(html => {
+                        document.body.innerHTML = html;
+                        document.getElementById('term').value = term;
+                        addEventListeners();
+                    })
+            }
+            addEventListeners();
+        })()
+    </script>
+</body>
+
+</html>

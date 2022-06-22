@@ -1,0 +1,37 @@
+.list{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 3rem;
+}
+
+.search-term{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 6rem;
+}
+
+.search-elements{
+    width: 12rem;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+.btn-clear{
+    cursor: pointer;
+    width: 5rem;
+    height: 2rem;
+    font-size: 1rem;
+    background-color: red;
+    color: white;
+}
+.btn-search{
+    cursor: pointer;
+    width: 5rem;
+    height: 2rem;
+    font-size: 1rem;
+    background-color: green;
+    color: white;
+}

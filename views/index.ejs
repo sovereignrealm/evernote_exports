@@ -1,0 +1,17 @@
+<html lang="en">
+
+<link rel="stylesheet" href="/assets/css/index.css">
+
+<body>
+    <div class="list">
+        <% for(let notebook of Object.keys(noteBooks)) { %>
+            <a href="notebooks/<%= notebook %>">
+                <%= notebook %>
+            </a>
+            <br>
+            <% } %>
+    </div>
+    
+</body>
+
+</html>
