@@ -104,7 +104,7 @@ server.get("/search-term/:notebook", (req, res) => {
             const filePath = basePath + "/" + fileName + ".html";
             const buff = fs.readFileSync(filePath);
             const content = buff.toString();
-            const match = content.match(term)
+            const match = content.match(new RegExp(term, "ig"));
             if (match) {
                 if (!(fileName in filteredFiles) && fileName !== "Evernote_index.") {
                     filteredFiles[fileName] = true;
