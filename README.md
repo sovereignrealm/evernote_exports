@@ -4,6 +4,7 @@ A search field is also included to find a word within all the notes.
 
 Example screenshot from http://localhost:8756/notebooks/programming
 
+![Selection_081](https://user-images.githubusercontent.com/101042734/175019523-a5989f68-327e-43d8-9e44-e0f4a2d74970.png)
 
 
 
