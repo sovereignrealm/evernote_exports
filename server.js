@@ -1,15 +1,28 @@
 "use strict";
 
+require('dotenv').config({ path: '.env' });
 const fs = require('fs');
 const path = require("path");
 const cheerio = require('cheerio');
 const express = require("express");
+const rateLimit = require("express-rate-limit");
+const cors = require('cors');
+const basicAuth = require("./middlewares/basicAuth");
 const server = express();
 
 
 server.use(express.static(path.join(__dirname, 'public')));
 server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'ejs');
+
+const authLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour window
+    max: 10, // start blocking after 5 requests
+    message:
+        "Too many requests from this IP"
+});
+
+server.use(cors());
 
 const noteBooks = {};
 let allFiles = {};
@@ -46,7 +59,7 @@ function addAllFiles(notebook, cb) {
     cb();
 }
 
-server.get("/", (req, res) => {
+server.get("/", authLimiter, basicAuth, (req, res) => {
     try {
         addNotebooks(() => {
             res.render("index", { noteBooks });
@@ -57,7 +70,7 @@ server.get("/", (req, res) => {
     }
 })
 
-server.get("/notebooks/:notebook/files/:file", (req, res) => {
+server.get("/notebooks/:notebook/files/:file", authLimiter, basicAuth, (req, res) => {
     try {
         const notebook = req.params.notebook;
         const file = req.params.file;
@@ -80,7 +93,7 @@ server.get("/notebooks/:notebook/files/:file", (req, res) => {
     }
 })
 
-server.get("/notebooks/:notebook", (req, res) => {
+server.get("/notebooks/:notebook", authLimiter, basicAuth, (req, res) => {
     try {
         const notebook = req.params.notebook;
         addAllFiles(notebook, () => {
@@ -92,7 +105,7 @@ server.get("/notebooks/:notebook", (req, res) => {
     }
 })
 
-server.get("/search-term/:notebook", (req, res) => {
+server.get("/search-term/:notebook", authLimiter, basicAuth, (req, res) => {
     try {
         const notebook = req.params.notebook;
         const term = req.query.term;
