@@ -125,6 +125,7 @@ server.get("/search-term/:notebook", authLimiter, basicAuth, (req, res) => {
             if (match) {
                 if (!(notebook in filteredFiles)) {
                     filteredFiles[notebook] = {};
+                    filteredFiles[notebook][fileName] = true;
                 } else if (!(fileName in filteredFiles[notebook]) && fileName !== "Evernote_index.") {
                     filteredFiles[notebook][fileName] = true;
                 }
