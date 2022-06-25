@@ -17,7 +17,7 @@
         </div>
     </div>
     <div class="list">
-        <% for(let file of Object.keys(files)) { %>
+        <% for(let file of Object.keys(files[notebook])) { %>
             <a href="<%= notebook %>/files/<%= file %>">
                 <%= file %>
             </a>
