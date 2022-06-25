@@ -17,7 +17,7 @@ server.set('view engine', 'ejs');
 
 const authLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour window
-    max: 10, // start blocking after 5 requests
+    max: 10, // start blocking after 10 requests
     message:
         "Too many requests from this IP"
 });
@@ -72,7 +72,7 @@ server.get("/", authLimiter, basicAuth, (req, res) => {
     }
 })
 
-server.get("/notebooks/:notebook/files/:file", authLimiter, basicAuth, (req, res) => {
+server.get("/notebooks/:notebook/files/:file", basicAuth, (req, res) => {
     try {
         const notebook = req.params.notebook;
         const file = req.params.file;
@@ -96,7 +96,7 @@ server.get("/notebooks/:notebook/files/:file", authLimiter, basicAuth, (req, res
     }
 })
 
-server.get("/notebooks/:notebook", authLimiter, basicAuth, (req, res) => {
+server.get("/notebooks/:notebook", basicAuth, (req, res) => {
     try {
         const notebook = req.params.notebook;
         addAllFiles(notebook, () => {
@@ -108,7 +108,7 @@ server.get("/notebooks/:notebook", authLimiter, basicAuth, (req, res) => {
     }
 })
 
-server.get("/search-term/:notebook", authLimiter, basicAuth, (req, res) => {
+server.get("/search-term/:notebook", basicAuth, (req, res) => {
     try {
         const notebook = req.params.notebook;
         const term = req.query.term;
