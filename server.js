@@ -44,7 +44,7 @@ function addNotebooks(cb) {
 
 function addAllFiles(notebook, cb) {
     const basePath = path.join(__dirname, 'notebooks/' + notebook);
-    if (Object.keys(allFiles).length !== 0) return cb();
+    if (notebook in allFiles) return cb();
     const filePath = basePath + "/" + "Evernote_index." + "html";
     const buff = fs.readFileSync(filePath);
     const $ = cheerio.load(buff.toString());
@@ -52,8 +52,10 @@ function addAllFiles(notebook, cb) {
     for (let node of list) {
         const fileName = $(node).text();
         const filePath = basePath + "/" + fileName + ".html";
-        if (!(fileName in allFiles) && fs.existsSync(filePath) && fileName !== "Evernote_index.") {
-            allFiles[fileName] = true;
+        if (!(notebook in allFiles)) {
+            allFiles[notebook] = {};
+        } else if (!(fileName in allFiles[notebook]) && fs.existsSync(filePath) && fileName !== "Evernote_index.") {
+            allFiles[notebook][fileName] = true;
         }
     }
     cb();
@@ -79,12 +81,13 @@ server.get("/notebooks/:notebook/files/:file", authLimiter, basicAuth, (req, res
             const filePath = basePath + "/" + file + ".html";
             res.sendFile(filePath);
         }
-        if (Object.keys(allFiles).length === 0) {
+        if (!(notebook in allFiles)) {
             addAllFiles(notebook, () => {
                 job();
             })
         } else {
-            if (!(file in allFiles)) return res.status(404).send("Not found");
+            if (!(notebook in allFiles)) return res.status(404).send("Not found notebook");
+            if (!(file in allFiles[notebook])) return res.status(404).send("Not found file");
             job();
         }
     } catch (e) {
@@ -110,7 +113,8 @@ server.get("/search-term/:notebook", authLimiter, basicAuth, (req, res) => {
         const notebook = req.params.notebook;
         const term = req.query.term;
         const basePath = path.join(__dirname, 'notebooks/' + notebook);
-        const files = Object.keys(allFiles);
+        if (!(notebook in allFiles)) return res.status(404).send("Not found notebook in search");
+        const files = Object.keys(allFiles[notebook]);
         if (files.length === 0) return res.sendStatus(500);
         filteredFiles = {};
         for (let fileName of files) {
@@ -119,8 +123,10 @@ server.get("/search-term/:notebook", authLimiter, basicAuth, (req, res) => {
             const content = buff.toString();
             const match = content.match(new RegExp(term, "ig"));
             if (match) {
-                if (!(fileName in filteredFiles) && fileName !== "Evernote_index.") {
-                    filteredFiles[fileName] = true;
+                if (!(notebook in filteredFiles)) {
+                    filteredFiles[notebook] = {};
+                } else if (!(fileName in filteredFiles[notebook]) && fileName !== "Evernote_index.") {
+                    filteredFiles[notebook][fileName] = true;
                 }
             }
         }
